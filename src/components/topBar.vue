@@ -10,9 +10,9 @@
   text-color="#fff"
   active-text-color="#ffd04b">
   <el-menu-item index="1">GIS地图信息</el-menu-item>
-  <el-menu-item index="2">资产管理</el-menu-item>
+  <el-menu-item index="2"><router-link to='/home'>资产管理</router-link></el-menu-item>
   <el-menu-item index="3">能耗分析</el-menu-item>
-  <el-menu-item index="4">事件告警</el-menu-item>
+  <el-menu-item index="4"><router-link to='/alarm'>事件告警</router-link></el-menu-item>
   <el-menu-item index="5">系统用户</el-menu-item>
   <el-menu-item index="6">项目管理</el-menu-item>
   <el-menu-item index="7">工单管理</el-menu-item>
