@@ -35,18 +35,23 @@
       width="55">
     </el-table-column>
     <el-table-column
-      label="日期"
-      width="120">
-      <template slot-scope="scope">{{ scope.row.date }}</template>
-    </el-table-column>
-    <el-table-column
-      prop="name"
-      label="姓名"
+      prop="modleCount"
+      label="序号"
       width="120">
     </el-table-column>
     <el-table-column
-      prop="address"
-      label="地址"
+      prop="eleboxName"
+      label="控制柜名称"
+      show-overflow-tooltip>
+    </el-table-column>
+        <el-table-column
+      prop="projectName"
+      label="项目名称"
+      show-overflow-tooltip>
+    </el-table-column>
+        <el-table-column
+      prop="mem"
+      label="备注"
       show-overflow-tooltip>
     </el-table-column>
   </el-table>
@@ -55,6 +60,7 @@
 </template>
 
 <script>
+import {deployEleboxList} from '../api'
 
 
 export default {
@@ -65,41 +71,33 @@ data() {
           user: '',
           region: ''
         },
-        tableData: [{
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
-        multipleSelection: []
+        tableData: [
+
+        ],
+        multipleSelection: [],
+        pageNumber:1,
+        pageSize:10,
+        nnlightctlProjectId:324,
+        codeNumber:''
       }
+    },
+    created(){
+      this.deployElebox();
     },
     methods:{
       onSubmit() {
         console.log(123)
+      },
+      deployElebox(){
+        let param = {
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize,
+          nnlightctlProjectId: this.nnlightctlProjectId,
+          codeNumber: this.codeNumber
+        }
+          deployEleboxList(param).then(data =>{
+            console.log(data)
+          })
       }
     }
 
