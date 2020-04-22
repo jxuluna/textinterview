@@ -1,15 +1,16 @@
 <template>
 <div>
   <el-form :inline="true" :model="formInline" class="demo-form-inline">
-  <el-form-item label="审批人">
-    <el-input v-model="formInline.user" placeholder="审批人"></el-input>
-  </el-form-item>
-  <el-form-item label="活动区域">
-    <el-select v-model="formInline.region" placeholder="活动区域">
-      <el-option label="区域一" value="shanghai"></el-option>
+      <el-form-item label="所属项目">
+    <el-select v-model="nnlightctlProjectId" placeholder="全部">
+      <el-option v-for="(item,index) in allProject" :key="index" :label="item.projectName" :value="item.id"></el-option>
       <el-option label="区域二" value="beijing"></el-option>
     </el-select>
   </el-form-item>
+  <el-form-item label="控制柜编码">
+    <el-input v-model="codeNumber" placeholder="控制柜编码"></el-input>
+  </el-form-item>
+
   <el-form-item>
     <el-button type="primary" icon="el-icon-search" @click="onSubmit">查询</el-button>
   </el-form-item>
@@ -55,12 +56,19 @@
       show-overflow-tooltip>
     </el-table-column>
   </el-table>
-
+<el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page.sync="pageNumber"
+      :page-size="pageSize"
+      layout="total, prev, pager, next"
+      :total="tableData.length">
+    </el-pagination>
 </div>
 </template>
 
 <script>
-import {deployEleboxList} from '../api'
+import {deployEleboxList,getProject} from '../api'
 
 
 export default {
@@ -71,22 +79,23 @@ data() {
           user: '',
           region: ''
         },
-        tableData: [
-
-        ],
+        tableData: [],
         multipleSelection: [],
         pageNumber:1,
         pageSize:10,
         nnlightctlProjectId:324,
+        modleCount:'',
+        allProject:[],
         codeNumber:''
       }
     },
     created(){
       this.deployElebox();
+      this.getProjectId()
     },
     methods:{
       onSubmit() {
-        console.log(123)
+        this.deployElebox()
       },
       deployElebox(){
         let param = {
@@ -96,8 +105,17 @@ data() {
           codeNumber: this.codeNumber
         }
           deployEleboxList(param).then(data =>{
-            console.log(data)
+            this.tableData = data.data.body.data
           })
+      },
+      handleCurrentChange(val) {
+        this.pageNumber = val;
+        this.deployElebox();
+      },
+      getProjectId(){
+        getProject().then(data =>{
+          this.allProject = data.data.body.data
+        })
       }
     }
 
