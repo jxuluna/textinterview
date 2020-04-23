@@ -20,15 +20,15 @@
         </template>
        <el-menu-item index="2">
         <i class="el-icon-menu"></i>
-        <span slot="title">道路部署</span>
+        <router-link to='/Home' slot="title">控制柜部署</router-link>
       </el-menu-item>
             <el-menu-item index="3">
         <i class="el-icon-menu"></i>
-        <span slot="title">控制柜部署</span>
+        <router-link to="/eleBox" slot="title">道路部署</router-link>
       </el-menu-item>
             <el-menu-item index="4">
         <i class="el-icon-menu"></i>
-        <span slot="title">灯具部署</span>
+        <router-link to="/lighting" slot="title">灯具部署</router-link>
       </el-menu-item>
 
 

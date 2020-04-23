@@ -40,14 +40,34 @@
       label="序号"
       width="120">
     </el-table-column>
+            <el-table-column
+      prop="projectName"
+      label="项目名称"
+      show-overflow-tooltip>
+    </el-table-column>
     <el-table-column
       prop="eleboxName"
       label="控制柜名称"
       show-overflow-tooltip>
     </el-table-column>
         <el-table-column
-      prop="projectName"
-      label="项目名称"
+      prop="electricityMeterCount"
+      label="电表"
+      show-overflow-tooltip>
+    </el-table-column>
+            <el-table-column
+      prop="centralizeControllerCount"
+      label="集中控制器"
+      show-overflow-tooltip>
+    </el-table-column>
+            <el-table-column
+      prop="modleCount"
+      label="开关模块"
+      show-overflow-tooltip>
+    </el-table-column>
+            <el-table-column
+      prop="photoperiodCount"
+      label="光照计"
       show-overflow-tooltip>
     </el-table-column>
         <el-table-column
