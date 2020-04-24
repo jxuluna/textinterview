@@ -70,7 +70,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="isAddRoad = false">取 消</el-button>
+        <el-button @click="isAddRoad = false">取消</el-button>
         <el-button type="primary" @click="addRoadingId">确 定</el-button>
       </div>
     </el-dialog>

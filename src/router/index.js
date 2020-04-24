@@ -4,6 +4,7 @@ import home from '../pages/Home'
 import alarm from '../pages/alarm'
 import eleBox from '../pages/eleBox'
 import lighting from  '../pages/lighting'
+import lampmodel from '../pages/lampmodel.vue'
 
 Vue.use(VueRouter);
 
@@ -24,6 +25,10 @@ const routes =[
 {
     path : '/lighting',
     component : lighting
+},
+{
+    path:'/lampmodel',
+    component: lampmodel
 },
 {
     path : '/',

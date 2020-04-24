@@ -13,4 +13,5 @@ export const deleteRoad = param => {return axios.post(`${baseUrl}api/deploy/dele
 export const showLighting = param => {return axios.post(`${baseUrl}api/deploy/showdeploylighting`,param)}
 export const addRoading = param => {return axios.post(`${baseUrl}api/deploy/addorupdateroading`,param)}
 export const selectElebox = param => {return axios.post(`${baseUrl}api/deploy/selectdeployelebox`,param)}
+export const listlamppost = param => {return axios.post(`${baseUrl}api/roadlighting/listlamppost`,param)}
 

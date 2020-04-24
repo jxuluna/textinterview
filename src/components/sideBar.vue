@@ -30,8 +30,10 @@
         <i class="el-icon-menu"></i>
         <router-link to="/lighting" slot="title">灯具部署</router-link>
       </el-menu-item>
-
-
+                  <el-menu-item index="5">
+        <i class="el-icon-menu"></i>
+        <router-link to="/lampmodel" slot="title">灯杆</router-link>
+      </el-menu-item>
       </el-submenu>
 
     </el-menu>
