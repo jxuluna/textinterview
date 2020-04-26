@@ -19,18 +19,14 @@ export const selectdeploylight = param => {return axios.post(`${baseUrl}api/depl
        "Content-Type": "multipart/form-data" 
     }
 })}
-export const selectByLighting = param => {return axios.post(`${baseUrl}api/deploy/selectbyiddeploylighting`,param,{
+export const selectByLighting = param => {return axios.post(`${baseUrl}api/deploy/queryControllerList`,param,{
     headers:{
        "Content-Type": "multipart/form-data" 
     }
 })}
-export const UpDateDeployLight = param => {return axios.post(`${baseUrl}api/deploy/showupdatedeploylighting`,param,{
+export const UpDateDeployLight = param => {return axios.post(`${baseUrl}api/deploy/updatedeploylighting`,param,{
     headers:{
        "Content-Type": "multipart/form-data" 
     }
 })}
-export const ShowUpdateLighting = param => {return axios.post(`${baseUrl}api/deploy/updatedeploylighting`,param,{
-    headers:{
-       "Content-Type": "multipart/form-data" 
-    }
-})}
+

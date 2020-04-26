@@ -46,7 +46,7 @@
         <el-button
           type="primary"
           icon="el-icon-plus"
-          @click="isAddRoad"
+          @click="openDialog"
         >灯具部署</el-button>
       </el-form-item>
     </el-form>
@@ -133,10 +133,10 @@
       <el-form :model="form">
         <el-form-item
           label="控制柜" :label-width="formLabelWidth"  :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
-          <el-select v-model="EleboxIds" placeholder="请选择控制柜">
+          <el-select v-model="EleboxIds" placeholder="请选择控制柜" @change="changeElebox"> <!--v-model取value的值，@change在选择之后把值给value -->
             <el-option v-for="(item,index) in allEleboxId"
               :key="index"
-              :label="item.eleboxName"
+              :label="`${item.eleboxName}-${item.codeNumber}`"
               :value="item.codeNumber"
             ></el-option>
           </el-select>
@@ -146,7 +146,7 @@
           :label-width="formLabelWidth"
         >
           <el-input
-            v-model="mem"
+            v-model="achieveProject" disabled
             autocomplete="off"
           ></el-input> 
         </el-form-item>
@@ -223,8 +223,7 @@
   </div>
 </template>
 <script>
-import { getProject, showLighting,ShowUpdateLighting } from '../api'//selectdeploylight,selectByLighting,UpDateDeployLight,
-
+import { getProject, showLighting,selectdeploylight } from '../api'
 export default {
   name: 'app',
   data () {
@@ -235,27 +234,20 @@ export default {
       },
       tableData: [],
       allProject: [],
-      nnlightctlProjectId: 324,
+      allEleboxId:[],
+      nnlightctlProjectId: 127,
       pageNumber: 1,
       pageSize: 10,
       isAddRoad:false,
-      deployState:0,
-      nnlightctlLampModelId:'',
-      nnlightctlLamppostId:'',
-      id:'',
-      nnlightctlEleboxId:'',
-      lampHolder:'',
-      lampControllerId:'',
-      fromerEleboxId:'',
-      changeEleboxId:'',
-      fromerLamppostId:'',
-      changeLamppostId:'',
-
+     projectId:'',
+     EleboxIds:'',
+     achieveProject:'',
     }
   },
   created () {
     this.getProjectId();
     this.showLightingId()
+    console.log(123)
   },
   methods: {
     handleCurrentChange (val) {
@@ -279,33 +271,28 @@ export default {
         this.tableData = data.data.body.data
       })
     },
-    ShowUpdateLightingId(){
-      let param= {
-        nnlightctlLampModelId:this.nnlightctlLampModelId,
-        nnlightctlLamppostId:this.nnlightctlLamppostId,
-        id:this.id,
-        nnlightctlEleboxId:this.nnlightctlEleboxId,
-        lampHolder:this.lampHolder
-      }
-      ShowUpdateLighting(param).then(data=>{
-       if (data.data.header.code === "1000") {
-          this.isAddRoad = false;
-          this.$message({
-            message: "添加成功",
-            type: "success"
-          });
-        }
+    selectdeployEle(){
+       let param = new FormData();
+          param.append("projectId", this.projectId);
+      
+      selectdeploylight(param).then(data =>{
+        this.allEleboxId = data.data.body.data[0].eleboxList
       })
     },
-    // selectdeploylightId(){
-    //   let param = {
-    //     projectId:this.nnlightctlProjectId,
-    //   }
-    //   selectdeploylight(param).then(data =>{
-    //     if(data.data.header.code === "1000") {
-    //     }
-    //   })
-    // }
+    openDialog (){
+      this.isAddRoad = true;
+      this.selectdeployEle()
+    },
+
+    changeElebox(){
+      let elem = this.allEleboxId.find(item =>{
+        return item.codeNumber == this.EleboxIds //item遍历数组的每一项，找到某一项的codeNumber=已经选择的codeNumber
+      })
+
+      this.projectId = elem.project.id; //下次掉接口时传的参数
+      this.achieveProject = elem.project.projectName//反显
+      this.selectdeployEle()
+    }
   }
 }
 </script>
