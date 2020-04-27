@@ -132,9 +132,22 @@
     >
       <el-form :model="form">
         <el-form-item
-          label="控制柜" :label-width="formLabelWidth"  :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="demo-ruleForm">
-          <el-select v-model="EleboxIds" placeholder="请选择控制柜" @change="changeElebox"> <!--v-model取value的值，@change在选择之后把值给value -->
-            <el-option v-for="(item,index) in allEleboxId"
+          label="控制柜"
+          :label-width="formLabelWidth"
+          :model="ruleForm"
+          status-icon
+          :rules="rules"
+          ref="ruleForm"
+          class="demo-ruleForm"
+        >
+          <el-select
+            v-model="EleboxIds"
+            placeholder="请选择控制柜"
+            @change="changeElebox"
+          >
+            <!--v-model取value的值，@change在选择之后把值给value -->
+            <el-option
+              v-for="(item,index) in allEleboxId"
               :key="index"
               :label="`${item.eleboxName}-${item.codeNumber}`"
               :value="item.codeNumber"
@@ -146,24 +159,31 @@
           :label-width="formLabelWidth"
         >
           <el-input
-            v-model="achieveProject" disabled
+            v-model="achieveProject"
+            disabled
             autocomplete="off"
-          ></el-input> 
+          ></el-input>
         </el-form-item>
         <el-form-item
           label="单灯控制器"
           :label-width="formLabelWidth"
         >
           <el-select
-            v-model="EleboxIds"
+            v-model="allLampModel"
             placeholder="请选择"
+            filterable
+            remote
+            reserve-keyword
+            :remote-method="changeLampModel"
+            :loading="loading"
           >
             <el-option
-              v-for="(item,index) in allEleboxId"
+              v-for="(item,index) in selectallLampModel"
               :key="index"
-              :label="item.eleboxName"
-              :value="item.codeNumber"
+              :label="`${item.lampostName}-${item.equipmentNumber}`"
+              :value="item.equipmentNumber"
             ></el-option>
+            <!--这里的lampostName不在queryControllerList这个接口里，而在selectdeploylighting这个接口里-->
           </el-select>
         </el-form-item>
         <el-form-item
@@ -223,7 +243,7 @@
   </div>
 </template>
 <script>
-import { getProject, showLighting,selectdeploylight } from '../api'
+import { getProject, showLighting, selectdeploylight, selectByLighting } from '../api'
 export default {
   name: 'app',
   data () {
@@ -234,14 +254,17 @@ export default {
       },
       tableData: [],
       allProject: [],
-      allEleboxId:[],
+      allEleboxId: [],
+      allLampModel: [],
+      selectallLampModel: [],
       nnlightctlProjectId: 127,
       pageNumber: 1,
       pageSize: 10,
-      isAddRoad:false,
-     projectId:'',
-     EleboxIds:'',
-     achieveProject:'',
+      isAddRoad: false,
+      projectId: '',
+      EleboxIds: '',
+      achieveProject: '',
+      loading: false,
     }
   },
   created () {
@@ -271,27 +294,54 @@ export default {
         this.tableData = data.data.body.data
       })
     },
-    selectdeployEle(){
-       let param = new FormData();
-          param.append("projectId", this.projectId);
-      
-      selectdeploylight(param).then(data =>{
+    selectdeployEle () {
+      let param = new FormData();
+      param.append("projectId", this.projectId);
+
+      selectdeploylight(param).then(data => {
         this.allEleboxId = data.data.body.data[0].eleboxList
       })
     },
-    openDialog (){
+    openDialog () {
       this.isAddRoad = true;
       this.selectdeployEle()
     },
 
-    changeElebox(){
-      let elem = this.allEleboxId.find(item =>{
+    changeElebox () {
+      let elem = this.allEleboxId.find(item => {
         return item.codeNumber == this.EleboxIds //item遍历数组的每一项，找到某一项的codeNumber=已经选择的codeNumber
       })
 
       this.projectId = elem.project.id; //下次掉接口时传的参数
       this.achieveProject = elem.project.projectName//反显
       this.selectdeployEle()
+
+    },
+    
+    selectByLightingId (query) {
+      let param = new FormData();
+      param.append("nnlightctlProjectId", this.projectId);
+      param.append("equipmentNumber", query);
+      selectByLighting(param).then(data => {
+        this.selectallLampModel = data.data.body.data[0].codeNumber
+      })
+    },
+
+
+    changeLampModel (query) {
+      if (query !== '') {
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          this.selectByLightingId(query);
+          this.selectallLampModel = this.list.filter(item => {
+            return this.allLampModel = item.data[0].codeNumber.indexOf("codeNumber") > -1;//这是干嘛的
+
+          });
+        }, 200);
+      } else {
+        this.selectallLampModel = [];
+      }
     }
   }
 }
