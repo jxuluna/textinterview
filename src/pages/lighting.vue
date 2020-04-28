@@ -90,6 +90,7 @@
               :label="`${item.lampName}-${item.equipmentNumber}`"
               :value="item.equipmentNumber"
             ></el-option>
+            <!--这里的lampostName不在queryControllerList这个接口里，而在selectdeploylighting这个接口里-->
           </el-select>
         </el-form-item>
         <el-form-item label="   ">
