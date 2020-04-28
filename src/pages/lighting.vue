@@ -92,40 +92,56 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label='   '>
+        <el-form-item label="   ">
           <el-radio-group v-model="lampListManage">
             <el-radio :label="1">灯具管理</el-radio>
             <el-radio :label="2">灯具</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="lampListManage == 1 ? '灯具管理' : '灯具' " :label-width="formLabelWidth">
-          <el-select v-model="EleboxIds" placeholder="请选择">
+          <el-select v-model="cdddManage" v-if="lampListManage == 1" placeholder="请选择">
             <el-option
-              v-for="(item,index) in allEleboxId"
+              v-for="(item,index) in allLampListManage"
               :key="index"
-              :label="item.eleboxName"
-              :value="item.codeNumber"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+          <el-select v-model="cddd" v-else placeholder="请选择">
+            <el-option
+              v-for="(item,index) in allLampList"
+              :key="index"
+              :label="item.lampostName"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label='   '>
+        <el-form-item label="   ">
           <el-radio-group v-model="lampHolderManage">
             <el-radio :label="1">灯杆管理</el-radio>
             <el-radio :label="2">灯杆</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label="lampHolderManage == 1? '灯杆管理': '灯杆'" :label-width="formLabelWidth">
-          <el-select v-model="EleboxIds" placeholder="请选择">
+          <el-select v-model="lampHolderIdsManage" v-if="lampHolderManage == 1" placeholder="请选择">
             <el-option
-              v-for="(item,index) in allEleboxId"
+              v-for="(item,index) in allLampModelManage"
               :key="index"
-              :label="item.eleboxName"
-              :value="item.codeNumber"
+              :label="item.lightName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+          <el-select v-model="lampHolderIds" v-else placeholder="请选择">
+            <el-option
+              v-for="(item,index) in allLampListModel"
+              :key="index"
+              :label="item.modelType"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="灯杆号" :label-width="formLabelWidth">
-          <el-input v-model="mem" autocomplete="off" placeholder="请输入灯头号"></el-input>
+          <el-input v-model="lampHead" autocomplete="off" placeholder="请输入灯头号"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -140,7 +156,8 @@ import {
   getProject,
   showLighting,
   selectdeploylight,
-  selectByLighting
+  selectByLighting,
+  UpDateDeployLight
 } from "../api";
 export default {
   name: "app",
@@ -164,7 +181,16 @@ export default {
       allLampModel: [],
       loading: false,
       lampListManage: 1,
-      lampHolderManage: 1
+      lampHolderManage: 1,
+      allLampListManage: [],
+      allLampList: [],
+      allLampModelManage: [],
+      allLampListModel: [],
+      cddd: "",
+      lampHolderIds: "",
+      lampHead: "",
+      cdddManage: "",
+      lampHolderIdsManage: ""
     };
   },
   created() {
@@ -200,6 +226,10 @@ export default {
 
       selectdeploylight(param).then(data => {
         this.allEleboxId = data.data.body.data[0].eleboxList;
+        this.allLampListManage = data.data.body.data[0].lampPostTypeViews;
+        this.allLampList = data.data.body.data[0].lamppostViews;
+        this.allLampModelManage = data.data.body.data[0].lightingModelTypeView;
+        this.allLampListModel = data.data.body.data[0].lightingViews;
       });
     },
     openDialog() {
@@ -235,6 +265,28 @@ export default {
       } else {
         this.allLampModel = [];
       }
+    },
+    addRoadingId() {
+      let param = {
+        nnlightctlProjectId: this.projectId,
+        nnlightctlEleboxId: this.EleboxIds,
+        id: this.lampModelSelect,
+        lightingModelTypeId: this.cdddManage,
+        nnlightctlLampModelId: this.cddd,
+        lamptype: this.lampHolderIdsManage,
+        nnlightctlLamppostId: this.lampHolderIds,
+        lampHolder: this.lampHead
+      }; //v-model里的值传给后端
+      UpDateDeployLight(param).then(data => {
+        if (data.data.header.code === "1000") {
+          this.isAddRoad = false;
+          this.$message({
+            message: "添加成功",
+            type: "success"
+          });
+        }
+      });
+      this.showLightingId;
     }
   }
 };
