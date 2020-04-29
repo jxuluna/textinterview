@@ -41,13 +41,14 @@
       <el-table-column prop="lampHolder" label="灯头号" show-overflow-tooltip></el-table-column>
       <el-table-column prop="projectName" label="所属项目" show-overflow-tooltip></el-table-column>
       <el-table-column prop="mem" label="备注" show-overflow-tooltip></el-table-column>
-      <template slot-scope="scope">
-            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑道路</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-          </template>
+      <el-table-column label="操作" width='150'>
+        <template slot-scope="scope">
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
-    
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -284,7 +285,7 @@ export default {
       pageNumber: 1,
       pageSize: 10,
       isAddRoad: false,
-      isEditRoad:false,
+      isEditRoad: false,
       projectId: "",
       EleboxIds: "",
       achieveProject: "",
@@ -399,12 +400,12 @@ export default {
       });
       this.showLightingId;
     },
-        handleEdit(index, row) {
+    handleEdit(index, row) {
       this.isEditRoad = true;
       this.id = row.id;
-      this.roadingName = row.roadingName
-      this.mem = row.mem
-    },
+      this.roadingName = row.roadingName;
+      this.mem = row.mem;
+    },//编辑返显传值
     handleDelete(index, row) {
       console.log(index, row);
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
@@ -433,9 +434,9 @@ export default {
           });
         });
     },
-    editRoadingId(){
+    editRoadingId() {
       let param = {
-        id:this.id,
+        id: this.id,
         nnlightctlProjectId: this.nnlightctlProjectId,
         roadingName: this.roadingName,
         eleboxIds: this.EleboxIds,
@@ -454,7 +455,6 @@ export default {
       });
       this.listroadingId();
     }
-
   }
 };
 </script>
