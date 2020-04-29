@@ -29,4 +29,9 @@ export const UpDateDeployLight = param => {return axios.post(`${baseUrl}api/depl
        "Content-Type": "multipart/form-data" 
     }
 })}
-
+export const deleteByLighting = param => {return axios.post(`${baseUrl}api/deploy/deletedeploylighting`,param,{
+    headers:{
+       "Content-Type": "multipart/form-data" 
+    }
+})}
+export const showUpLamppost = param => {return axios.post(`${baseUrl}api/deploy/showupdatedeploylighting`,param)}

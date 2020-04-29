@@ -41,7 +41,13 @@
       <el-table-column prop="lampHolder" label="灯头号" show-overflow-tooltip></el-table-column>
       <el-table-column prop="projectName" label="所属项目" show-overflow-tooltip></el-table-column>
       <el-table-column prop="mem" label="备注" show-overflow-tooltip></el-table-column>
+      <template slot-scope="scope">
+            <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑道路</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
     </el-table>
+
+    
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -150,6 +156,107 @@
         <el-button type="primary" @click="addRoadingId">确 定</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog title="编辑灯具部署" :visible.sync="isEditRoad">
+      <el-form :model="form">
+        <el-form-item
+          label="控制柜"
+          :label-width="formLabelWidth"
+          :model="ruleForm"
+          status-icon
+          :rules="rules"
+          ref="ruleForm"
+          class="demo-ruleForm"
+        >
+          <el-select v-model="EleboxIds" placeholder="请选择控制柜" @change="changeElebox">
+            <!--v-model取value的值，@change在选择之后把值给value -->
+            <el-option
+              v-for="(item,index) in allEleboxId"
+              :key="index"
+              :label="`${item.eleboxName}-${item.codeNumber}`"
+              :value="item.codeNumber"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属项目" :label-width="formLabelWidth">
+          <el-input v-model="achieveProject" disabled autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="单灯控制器" :label-width="formLabelWidth">
+          <el-select
+            v-model="lampModelSelect"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请选择"
+            :remote-method="remoteMethod"
+            :loading="loading"
+          >
+            <el-option
+              v-for="(item,index) in allLampModel"
+              :key="index"
+              :label="`${item.lampName}-${item.equipmentNumber}`"
+              :value="item.equipmentNumber"
+            ></el-option>
+            <!--这里的lampostName不在queryControllerList这个接口里，而在selectdeploylighting这个接口里-->
+          </el-select>
+        </el-form-item>
+        <el-form-item label="   ">
+          <el-radio-group v-model="lampListManage">
+            <el-radio :label="1">灯具管理</el-radio>
+            <el-radio :label="2">灯具</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="lampListManage == 1 ? '灯具管理' : '灯具' " :label-width="formLabelWidth">
+          <el-select v-model="cdddManage" v-if="lampListManage == 1" placeholder="请选择">
+            <el-option
+              v-for="(item,index) in allLampListManage"
+              :key="index"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+          <el-select v-model="cddd" v-else placeholder="请选择">
+            <el-option
+              v-for="(item,index) in allLampList"
+              :key="index"
+              :label="item.lampostName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="   ">
+          <el-radio-group v-model="lampHolderManage">
+            <el-radio :label="1">灯杆管理</el-radio>
+            <el-radio :label="2">灯杆</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label="lampHolderManage == 1? '灯杆管理': '灯杆'" :label-width="formLabelWidth">
+          <el-select v-model="lampHolderIdsManage" v-if="lampHolderManage == 1" placeholder="请选择">
+            <el-option
+              v-for="(item,index) in allLampModelManage"
+              :key="index"
+              :label="item.lightName"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+          <el-select v-model="lampHolderIds" v-else placeholder="请选择">
+            <el-option
+              v-for="(item,index) in allLampListModel"
+              :key="index"
+              :label="item.modelType"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="灯杆号" :label-width="formLabelWidth">
+          <el-input v-model="lampHead" autocomplete="off" placeholder="请输入灯头号"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isEditRoad = false">取消</el-button>
+        <el-button type="primary" @click="editRoadingId">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -158,7 +265,9 @@ import {
   showLighting,
   selectdeploylight,
   selectByLighting,
-  UpDateDeployLight
+  UpDateDeployLight,
+  deleteByLighting,
+  showUpLamppost
 } from "../api";
 export default {
   name: "app",
@@ -175,6 +284,7 @@ export default {
       pageNumber: 1,
       pageSize: 10,
       isAddRoad: false,
+      isEditRoad:false,
       projectId: "",
       EleboxIds: "",
       achieveProject: "",
@@ -288,7 +398,63 @@ export default {
         }
       });
       this.showLightingId;
+    },
+        handleEdit(index, row) {
+      this.isEditRoad = true;
+      this.id = row.id;
+      this.roadingName = row.roadingName
+      this.mem = row.mem
+    },
+    handleDelete(index, row) {
+      console.log(index, row);
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let param = new FormData();
+          param.append("lampControllerIds", [row.id]);
+          deleteByLighting(param).then(data => {
+            if (data.data.header.code === "1000") {
+              this.isAddRoad = false;
+              this.$message({
+                message: "删除成功",
+                type: "success"
+              });
+              this.showLightingId();
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+    editRoadingId(){
+      let param = {
+        id:this.id,
+        nnlightctlProjectId: this.nnlightctlProjectId,
+        roadingName: this.roadingName,
+        eleboxIds: this.EleboxIds,
+        mem: this.mem,
+        longitude: 122,
+        latitude: 122
+      };
+      showUpLamppost(param).then(data => {
+        if (data.data.header.code === "1000") {
+          this.isEditRoad = false;
+          this.$message({
+            message: "编辑成功",
+            type: "success"
+          });
+        }
+      });
+      this.listroadingId();
     }
+
   }
 };
 </script>
