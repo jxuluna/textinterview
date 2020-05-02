@@ -15,9 +15,11 @@
     <el-form :inline="true" :model="formInline" class="demo-form-inline">
       <el-form-item>
         <el-button type="danger" icon="el-icon-delete" @click="onDelete">批量删除</el-button>
-        <el-button type="primary" icon="el-icon-plus" @click="isAddRoad = true">新增</el-button>
+        <el-button type="primary" icon="el-icon-plus" @click="isAddRoad = true;title = '新增道路'">新增</el-button>
       </el-form-item>
-
+<div>
+  store中的姓名:{{this.$store.state.name}}
+</div>
       <el-table
         ref="multipleTable"
         :data="tableData"
@@ -36,7 +38,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑道路</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button><!--通过点击事件调用这个方法 -->
           </template>
         </el-table-column>
       </el-table>
@@ -50,7 +52,7 @@
       ></el-pagination>
     </el-form>
 
-    <el-dialog title="新增道路" :visible.sync="isAddRoad">
+    <!-- <el-dialog title="新增道路" :visible.sync="isAddRoad">
       <el-form :model="form">
         <el-form-item label="道路名称" :label-width="formLabelWidth">
           <el-input v-model="roadingName" autocomplete="off"></el-input>
@@ -73,9 +75,11 @@
         <el-button @click="isAddRoad = false">取消</el-button>
         <el-button type="primary" @click="addRoadingId">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
 
-    <el-dialog title="编辑道路" :visible.sync="isEditRoad">
+<edit-add-elebox :show.sync='isAddRoad' :title="title" :row='row'></edit-add-elebox>
+
+    <!-- <el-dialog title="编辑道路" :visible.sync="isEditRoad">
       <el-form :model="form">
         <el-form-item label="道路名称" :label-width="formLabelWidth">
           <el-input v-model="roadingName" autocomplete="off"></el-input>
@@ -98,7 +102,7 @@
         <el-button @click="isEditRoad = false">取 消</el-button>
         <el-button type="primary" @click="editRoadingId">确 定</el-button>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 <script>
@@ -109,6 +113,8 @@ import {
   selectElebox,
   deleteRoad
 } from "../api";
+ 
+import editAddElebox from '../components/editAddElebox'
 
 export default {
   name: "app",
@@ -127,19 +133,28 @@ export default {
       roadingIds: [],
       eleboxId: 0,
       isAddRoad: false,
-      isEditRoad:false,
       roadingName: "",
       EleboxIds: [],
       allEleboxId: [],
       mem: "",
       id:'',
+      row:{},
+      title:''
     };
   },
+components:{
+editAddElebox
+}, //注册组件
+
   created() {
     this.listroadingId();
     this.getProjectId();
     this.selectEleboxId();
     // this.deleteRoad()
+    this.$store.commit('changeName')
+    this.$store.commit('changeNameById',{
+      name:this.nnlightctlProjectId
+    })
   },
   methods: {
     // onDelete (){
@@ -173,31 +188,13 @@ export default {
         this.tableData = data.data.body.data;
       });
     },
-    addRoadingId() {
-      let param = {
-        nnlightctlProjectId: this.nnlightctlProjectId,
-        roadingName: this.roadingName,
-        eleboxIds: this.EleboxIds,
-        mem: this.mem,
-        longitude: 122,
-        latitude: 122
-      };
-      addRoading(param).then(data => {
-        if (data.data.header.code === "1000") {
-          this.isAddRoad = false;
-          this.$message({
-            message: "添加成功",
-            type: "success"
-          });
-        }
-      });
-      this.listroadingId();
-    },
+   
     handleEdit(index, row) {
-      this.isEditRoad = true;
-      this.id = row.id;
-      this.roadingName = row.roadingName
-      this.mem = row.mem
+      this.isAddRoad = true;
+ 
+      this.row = row
+      console.log(this.row)
+      this.title = '编辑道路'
     },
     handleDelete(index, row) {
       console.log(index, row);
@@ -239,7 +236,7 @@ export default {
       };
       addRoading(param).then(data => {
         if (data.data.header.code === "1000") {
-          this.isEditRoad = false;
+          this.isAddRoad = false;
           this.$message({
             message: "编辑成功",
             type: "success"
